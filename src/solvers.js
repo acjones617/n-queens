@@ -13,8 +13,23 @@
 
 // return a matrix (an array of arrays) representing a single nxn chessboard, with n rooks placed such that none of them can attack each other
 
+var makeEmptyRow = function(n) {
+  return _(_.range(n)).map(function() {
+    return 0;
+  });
+};
+
+var makeEmptyMatrix = function(n) {
+  return _(_.range(n)).map(function() {
+    return _(_.range(n)).map(function() {
+      return 0;
+    });
+  });
+};
+
+
 window.findNRooksSolution = function(n) {
-  
+
   var num = n || 0;
   var solution;
   // never put rooks on same row, treat this as similar to the rock/paper/scissors except each rounds are rows.
@@ -23,6 +38,7 @@ window.findNRooksSolution = function(n) {
   var possibleBoards = [];
 
   //possible rows are arrays of length num, with 1 in them.
+  // optimize this later
   var zeroRow = [];
   for (var i = 0; i < num; i++) {
     zeroRow.push(0);
@@ -44,10 +60,13 @@ window.findNRooksSolution = function(n) {
       for (var k = 0; k < possibleRows.length; k++) {
         var newSemiBoard = semiBoard.slice();
         newSemiBoard.push(possibleRows[k]);
+        // if already conflicts, scrap it, don't run recursion on it.
+        // must move methods out of board methods I think.
+
         allBoards(newSemiBoard, num);
       }
     }
-  }
+  };
 
   allBoards([], num);
 
@@ -56,7 +75,7 @@ window.findNRooksSolution = function(n) {
   // now check each board. If one passes all tests, it is a solution.
   for (var board = 0; board < possibleBoards.length; board++) {
     var newBoard = new Board(possibleBoards[board]);
-    if (!(newBoard.hasAnyRowConflicts() || newBoard.hasAnyColConflicts())) {
+    if (!(newBoard.hasAnyRooksConflicts())) {
       solution = newBoard.returnBoard();
       break;
     }
@@ -114,7 +133,7 @@ window.countNRooksSolutions = function(n) {
   // now check each board. If one passes all tests, it is a solution.
   for (var board = 0; board < possibleBoards.length; board++) {
     var newBoard = new Board(possibleBoards[board]);
-    if (!(newBoard.hasAnyRowConflicts() || newBoard.hasAnyColConflicts())) {
+    if (!(newBoard.hasAnyRooksConflicts())) {
       solutionCount+= 1;
     }
   }
@@ -182,7 +201,7 @@ window.findNQueensSolution = function(n) {
 window.countNQueensSolutions = function(n) {
   var solutionCount = 0; //fixme
   var num = n || 0;
-  
+
   // never put rooks on same row, treat this as similar to the rock/paper/scissors except each rounds are rows.
 
   // generate list of possible boards;
@@ -226,6 +245,6 @@ window.countNQueensSolutions = function(n) {
   }
   console.log('Number of solutions for ' + n + ' queens:', solutionCount);
   return solutionCount;
-  
+
 };
 
