@@ -167,8 +167,9 @@
     },
 
     // test if any major diagonals on this board contain conflicts
+    // doesn't check trivial cases where diagonal only contains one square.
     hasAnyMajorDiagonalConflicts: function() {
-      for (var i = -this.attributes.n + 2; i < this.attributes.n; i++) {
+      for (var i = -this.attributes.n + 2; i < this.attributes.n - 1; i++) {
         if (this.hasMajorDiagonalConflictAt(i)) {
           return true;
         }
@@ -206,8 +207,9 @@
     },
 
     // test if any minor diagonals on this board contain conflicts
+    // doesn't check the trivial cases where diagonal only contains one square;
     hasAnyMinorDiagonalConflicts: function() {
-      for (var i = 0; i < this.attributes.n; i++) {
+      for (var i = 1; i < this.attributes.n*2 - 2; i++) {
         if (this.hasMinorDiagonalConflictAt(i)) {
           return true;
         }
