@@ -1,30 +1,17 @@
 /*--------------------  Helper Functions  ---------------------*/
 
-// check if any other pieces
-var noOtherPieces = function(array) {
-  for (var i = 0; i < array.length; i++) {
-    if (array[i] === 1) {
-      return false;
-    }
-  }
-  return true;
-};
-
-
 // COLUMNS - run from top to bottom
 // --------------------------------------------------------------
 //
 // test if a specific column on this board contains a conflict
 var noColConflict = function(board, rowIndex, colIndex) {
-  var col = [];
-
   for (var i = 0; i < board.length; i++) {
-    // don't need to push the row our current piece is on
-    if (i !== rowIndex) {
-      col.push(this.attributes[i][colIndex]);
+    // don't check row our current piece is on
+    if (i !== rowIndex && board[i][colIndex] === 1) {
+      return false;
     }
   }
-  return noOtherPieces(col);
+  return true;
 };
 
 
@@ -33,20 +20,17 @@ var noColConflict = function(board, rowIndex, colIndex) {
 //
 // test if a specific major diagonal on this board contains a conflict
 var noMajorDiagonalConflict = function(board, rowIndex, colIndex) {
-  var majorDiag = [];
   var diagColIndex = colIndex - rowIndex;
-
   // NOTE: board[0].length supposedly checks column count
   var maxIndex = Math.min(board.length, board[0].length - diagColIndex);
 
   for (var i = -Math.min(diagColIndex,0); i < maxIndex; i++) {
-    // don't need to push the row our current piece is on
-
-    if (i !== rowIndex) {
-      majorDiag.push(board[i][diagColIndex + i]);
+    // don't check the row our current piece is on
+    if (i !== rowIndex && board[i][diagColIndex + i] === 1) {
+      return false;
     }
   }
-  return noOtherPieces(majorDiag);
+  return true;
 };
 
 //TEST:
@@ -60,19 +44,17 @@ var noMajorDiagonalConflict = function(board, rowIndex, colIndex) {
 // test if a specific minor diagonal on this board contains a conflict
 
 var noMinorDiagonalConflict = function(board, rowIndex, colIndex) {
-  var minorDiag = [];
   var diagColIndex = rowIndex + colIndex;
 
   var maxIndex = Math.min(diagColIndex + 1, board.length);
   // board[0].length should refer to num columns on board.
   for (var i = Math.max(0, diagColIndex - board[0].length + 1); i < maxIndex; i++) {
     // Don't push current row/col we're checking conflict on
-    if (i !== rowIndex){
-      minorDiag.push(board[i][diagColIndex - i]);
+    if (i !== rowIndex && board[i][diagColIndex - 1] === 1){
+      return false;
     }
   }
-
-  return noOtherPieces(minorDiag);
+  return true;
 };
 
 
@@ -108,29 +90,25 @@ var makeEmptyMatrix = function(n) {
   });
 };
 
+var makePossibleRows = function(n) {
+  var rows = makeEmptyMatrix(n);
+  for (var i = 0; i < n; i++) {
+    rows[i][i] = 1;
+  }
+  return rows;
+};
+
 
 window.findNRooksSolution = function(n) {
-
   var num = n || 0;
   var solution;
   // never put rooks on same row, treat this as similar to the rock/paper/scissors except each rounds are rows.
-
-  // generate list of possible boards;
-  var possibleBoards = [];
+  // recursively put rook on next row, check if colConflict.
+  // If not, then continue recursion, otherwise, cut off recursion
 
   //possible rows are arrays of length num, with 1 in them.
-  // optimize this later
-  var zeroRow = [];
-  for (var i = 0; i < num; i++) {
-    zeroRow.push(0);
-  }
 
-  var possibleRows = [];
-  for (var j = 0; j < num; j++) {
-    var newRow = zeroRow.slice();
-    newRow[j] = 1;
-    possibleRows.push(newRow);
-  }
+  var possibleRows = makePossibleRows(num);
 
   // now generate list of all possible boards:
 
