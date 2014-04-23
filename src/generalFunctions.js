@@ -105,14 +105,15 @@ var noColConflict = function(board, rowIndex, colIndex) {
 };
 
 // test if any columns on this board contain conflicts
-hasAnyColConflicts: function() {
-  for (var i = 0; i < this.attributes.n; i++) {
-    if (this.hasColConflictAt(i)) {
-      return true;
-    }
-  }
-  return false;
-},
+// should be unnecessary since checking in realtime
+// hasAnyColConflicts: function() {
+//   for (var i = 0; i < this.attributes.n; i++) {
+//     if (this.hasColConflictAt(i)) {
+//       return true;
+//     }
+//   }
+//   return false;
+// };
 
 
 
@@ -120,10 +121,9 @@ hasAnyColConflicts: function() {
 // --------------------------------------------------------------
 //
 // test if a specific major diagonal on this board contains a conflict
-hasMajorDiagonalConflictAt: function(majorDiagonalColumnIndexAtFirstRow) {
+var noMajorDiagonalConflict = function(board, rowIndex, colIndex) {
   var majorDiag = [];
-  var diagColIndex = majorDiagonalColumnIndexAtFirstRow;
-  var rowIndex;
+  var diagColIndex = colIndex - rowIndex;
 
   // if (diagColIndex < 0) {
   //   for (var i = -diagColIndex; i < this.attributes.n; i++) {
@@ -135,25 +135,35 @@ hasMajorDiagonalConflictAt: function(majorDiagonalColumnIndexAtFirstRow) {
   //   }
   // }
   // in other words:
-  var maxIndex = Math.min(this.attributes.n, this.attributes.n - diagColIndex);
+  // NOTE: board[0].length supposedly checks column count
+  var maxIndex = Math.min(board.length, board[0].length - diagColIndex);
 
   for (var i = -Math.min(diagColIndex,0); i < maxIndex; i++) {
-    majorDiag.push(this.attributes[i][diagColIndex + i]);
-  }
+    // don't need to push the row our current piece is on
 
-  return this.moreThanOnePiece(majorDiag);
-},
+    if (i !== rowIndex) {
+      majorDiag.push(board[i][diagColIndex + i]);
+    }
+  }
+  return noOtherPieces(majorDiag);
+};
+
+//TEST:
+// [[0,0,0,1,0,0],
+// [0,1,0,0,0,0],
+// [0,0,0,0,0,1]]
 
 // test if any major diagonals on this board contain conflicts
 // doesn't check trivial cases where diagonal only contains one square.
-hasAnyMajorDiagonalConflicts: function() {
-  for (var i = -this.attributes.n + 2; i < this.attributes.n - 1; i++) {
-    if (this.hasMajorDiagonalConflictAt(i)) {
-      return true;
-    }
-  }
-  return false;
-},
+// shouldn't be necessary, checking in real time.
+// hasAnyMajorDiagonalConflicts: function() {
+//   for (var i = -this.attributes.n + 2; i < this.attributes.n - 1; i++) {
+//     if (this.hasMajorDiagonalConflictAt(i)) {
+//       return true;
+//     }
+//   }
+//   return false;
+// };
 
 
 
@@ -162,9 +172,9 @@ hasAnyMajorDiagonalConflicts: function() {
 //
 // test if a specific minor diagonal on this board contains a conflict
 
-hasMinorDiagonalConflictAt: function(minorDiagonalColumnIndexAtFirstRow) {
+var noMinorDiagonalConflict = function(board, rowIndex, colIndex) {
   var minorDiag = [];
-  var diagColIndex = minorDiagonalColumnIndexAtFirstRow;
+  var diagColIndex = rowIndex + colIndex;
 
   // if (diagColIndex >= this.attributes.n) {
   //   for (var i = diagColIndex - this.attributes.n + 1; i < this.attributes.n; i++) {
@@ -176,30 +186,20 @@ hasMinorDiagonalConflictAt: function(minorDiagonalColumnIndexAtFirstRow) {
   //   }
   // }
   // in other words:
-  var maxIndex = Math.min(diagColIndex + 1, this.attributes.n);
-  for (var i = Math.max(0, diagColIndex - this.attributes.n + 1); i < maxIndex; i++) {
-    minorDiag.push(this.attributes[i][diagColIndex - i]);
+  var maxIndex = Math.min(diagColIndex + 1, board.length);
+  // board[0].length should refer to num columns on board.
+  for (var i = Math.max(0, diagColIndex - board[0].length + 1); i < maxIndex; i++) {
+    // Don't push current row/col we're checking conflict on
+    if (i !== rowIndex){
+      minorDiag.push(board[i][diagColIndex - i]);
+    }
   }
 
-  return this.moreThanOnePiece(minorDiag);
-},
+  return noOtherPieces(minorDiag);
+};
 
 // test if any minor diagonals on this board contain conflicts
 // doesn't check the trivial cases where diagonal only contains one square;
-hasAnyMinorDiagonalConflicts: function() {
-  for (var i = 1; i < this.attributes.n*2 - 2; i++) {
-    if (this.hasMinorDiagonalConflictAt(i)) {
-      return true;
-    }
-  }
-  return false;
-}
-
+// Shouldn't be necessary anymore, checking in Real Time
 
 /*--------------------  End of Helper Functions  ---------------------*/
-
-
-});
-
-
-};
