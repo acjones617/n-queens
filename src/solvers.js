@@ -101,46 +101,42 @@ var makePossibleRows = function(n) {
 
 window.findNRooksSolution = function(n) {
   var num = n || 0;
-  var solution;
+  var allSolutions = [];
   // never put rooks on same row, treat this as similar to the rock/paper/scissors except each rounds are rows.
   // recursively put rook on next row, check if colConflict.
   // If not, then continue recursion, otherwise, cut off recursion
 
-  //possible rows are arrays of length num, with 1 in them.
-
+  //possible rows are arrays of length num, with a single 1 in them.
   var possibleRows = makePossibleRows(num);
 
-  // now generate list of all possible boards:
+  // now generate list of all solutions:
 
-  var allBoards = function(semiBoard, num) {
+  var findAllSolutions = function(semiBoard, num) {
     if (semiBoard.length === num) {
-      possibleBoards.push(semiBoard);
+      allSolutions.push(semiBoard);
     } else {
-      for (var k = 0; k < possibleRows.length; k++) {
+      for (var i = 0; i < possibleRows.length; i++) {
         var newSemiBoard = semiBoard.slice();
-        newSemiBoard.push(possibleRows[k]);
+        newSemiBoard.push(possibleRows[i]);
+        // i = col on which new queen/rook was added
+        // newSemiBoard.length - 1 = row on which new queen/rook was added
         // if already conflicts, scrap it, don't run recursion on it.
-        // must move methods out of board methods I think.
-
-        allBoards(newSemiBoard, num);
+        if (noColConflict(newSemiBoard, newSemiBoard.length - 1, i)){
+          findAllSolutions(newSemiBoard, num);
+        }
       }
     }
   };
 
-  allBoards([], num);
+  findAllSolutions([], num);
 
-
-
-  // now check each board. If one passes all tests, it is a solution.
-  for (var board = 0; board < possibleBoards.length; board++) {
-    var newBoard = new Board(possibleBoards[board]);
-    if (!(newBoard.hasAnyRooksConflicts())) {
-      solution = newBoard.returnBoard();
-      break;
-    }
+  var singleSolution = null;
+  if (allSolutions.length) {
+    singleSolution = allSolutions[0];
   }
-  console.log('Single solution for ' + num + ' rooks:', JSON.stringify(solution));
-  return solution;
+
+  console.log('Single solution for ' + num + ' rooks:', JSON.stringify(singleSolution));
+  return singleSolution;
 };
 
 
