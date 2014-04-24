@@ -5,7 +5,10 @@
 //
 // test if a specific column on this board contains a conflict
 var noColConflict = function(board, rowIndex, colIndex) {
-  for (var i = 0; i < board.length; i++) {
+  // board[0].length should refer to num columns on board.
+  // minus 1 on the "i bound" since we'll always be checking against placing one on the last row,
+  // and we don't want to check that one. We are checking conflicts against that.
+  for (var i = 0; i < board.length - 1; i++) {
     // don't check row our current piece is on
     if (i !== rowIndex && board[i][colIndex] === 1) {
       return false;
@@ -21,12 +24,10 @@ var noColConflict = function(board, rowIndex, colIndex) {
 // test if a specific major diagonal on this board contains a conflict
 var noMajorDiagonalConflict = function(board, rowIndex, colIndex) {
   var diagColIndex = colIndex - rowIndex;
-  // NOTE: board[0].length supposedly checks column count
   var maxIndex = Math.min(board.length, board[0].length - diagColIndex);
-
-  for (var i = -Math.min(diagColIndex,0); i < maxIndex; i++) {
-    // don't check the row our current piece is on
-    if (i !== rowIndex && board[i][diagColIndex + i] === 1) {
+  // check noColConflict for notes
+  for (var i = -Math.min(diagColIndex,0); i < maxIndex - 1; i++) {
+    if (board[i][diagColIndex + i] === 1) {
       return false;
     }
   }
@@ -47,10 +48,9 @@ var noMinorDiagonalConflict = function(board, rowIndex, colIndex) {
   var diagColIndex = rowIndex + colIndex;
 
   var maxIndex = Math.min(diagColIndex + 1, board.length);
-  // board[0].length should refer to num columns on board.
-  for (var i = Math.max(0, diagColIndex - board[0].length + 1); i < maxIndex; i++) {
-    // Don't push current row/col we're checking conflict on
-    if (i !== rowIndex && board[i][diagColIndex - i] === 1){
+  // check noColConflict for notes
+  for (var i = Math.max(0, diagColIndex - board[0].length + 1); i < maxIndex - 1; i++) {
+    if (board[i][diagColIndex - i] === 1){
       return false;
     }
   }
