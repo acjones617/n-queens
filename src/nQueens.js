@@ -14,9 +14,10 @@ var noDiagonalConflict = function(board) {
 
 window.countNQueensSolutions = function(n) {
   var num = n || 0;
+  if (num === 0) {
+    return 1;
+  }
   var solutionCount = 0;
-  // recursively put "queen" on next "row" (aka array cell), in specific "columns" (aka the number in the array cell)
-  // If it doesn't diagonally conflict, then continue recursion, otherwise, cut off recursion
 
   //possible rows is just a range of numbers from 0 to n now.
   var possibleRows = [];
@@ -24,34 +25,40 @@ window.countNQueensSolutions = function(n) {
     possibleRows.push(i);
   }
 
-  // now generate solutions:
-  var findSolutions = function(semiBoard, possibleRowsLeft) {
+  // recursively put "queen" on next "row" (aka array cell), in specific "columns" (aka the number in the array cell)
+  // If it doesn't diagonally conflict, then continue recursion, otherwise, cut off recursion
+  var findSolutions = function(semiBoard, possibleRowsLeft, lastIndex, lastLastIndex) {
     var rowsToCheck;
 
     if (semiBoard.length === n) {
       // count found solution and the mirrored solution,
-      // if top element not in center, else just count 1.
-      // if (num % 2 === 1 && semiBoard[0][(num-1)/2]) {
-      solutionCount++;
-      // } else {
-      //   solutionCount += 2;
-
+      // if top element not in exact center, count 2,
+      // else just count 1.
+      if (n % 2 === 1 && semiBoard[0] === (n-1)/2) {
+        solutionCount++;
+      } else {
+        solutionCount += 2;
+      }
       return;
     } else {
       // for first row, we only want to add half of possible Rows
       // then, double count solutions (count mirrored solutions)
       rowsToCheck = possibleRowsLeft.length;
-      // if (semiBoard.length === 0) {
-      //   rowsToCheck = Math.ceil(num/2);
-      // }
-
+      if (semiBoard.length === 0) {
+        rowsToCheck /= 2;
+      }
+      // don't even bother checking if index is immediate diagonal of lastIndex
+      // or if index is +-2 diagonal of lastLastIndex
       for (var i = 0; i < rowsToCheck; i++) {
+        if (possibleRowsLeft[i] !== lastIndex - 1 && possibleRowsLeft[i] !== lastIndex + 1 && possibleRowsLeft[i] !== lastLastIndex - 2 && possibleRowsLeft[i] !== lastLastIndex + 2){
         // create copy of semiBoard so we don't mess with it.
-        var newBoard = semiBoard.slice();
-        var rowsLeft = possibleRowsLeft.slice();
-        newBoard.push(rowsLeft.splice(i,1)[0]);
-        if (noDiagonalConflict(newBoard)) {
-          findSolutions(newBoard, rowsLeft);
+          var newBoard = semiBoard.slice();
+          var rowsLeft = possibleRowsLeft.slice();
+          var nextColNum = rowsLeft.splice(i,1)[0];
+          newBoard.push(nextColNum);
+          if (noDiagonalConflict(newBoard)) {
+            findSolutions(newBoard, rowsLeft, nextColNum, lastIndex);
+          }
         }
       }
     }
