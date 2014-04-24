@@ -62,7 +62,7 @@ window.countNQueensSolutions = function(n) {
     }
   };
 
-  findSolutions([], possibleCols, -10);
+  findSolutions([], possibleCols);
 
   console.log('Number of solutions for ' + n + ' queens:', solutionCount);
   return solutionCount;
