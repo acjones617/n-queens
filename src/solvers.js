@@ -276,7 +276,7 @@ window.countNQueensSolutions = function(n) {
 
   // now generate one solutions:
 
-  var findASolution = function(semiBoard, num) {
+  var findASolution = function(semiBoard, num, lastIndex) {
     var rowsToCheck;
     if (semiBoard.length === num) {
       // count found solution and the mirrored solution,
@@ -292,18 +292,20 @@ window.countNQueensSolutions = function(n) {
       // then, double count solutions (count mirrored solutions)
       rowsToCheck = possibleRows.length;
       if (semiBoard.length === 0) {
-        rowsToCheck = Math.floor((num+1)/2);
+        rowsToCheck = Math.ceil(num/2);
       }
       for (var i = 0; i < rowsToCheck; i++) {
-        var newSemiBoard = semiBoard.slice();
-        newSemiBoard.push(possibleRows[i]);
-        // i = col on which new queen/rook was added
-        // newSemiBoard.length - 1 = row on which new queen/rook was added
-        // if already conflicts, scrap it, don't run recursion on it.
-        if (noColConflict(newSemiBoard, newSemiBoard.length - 1, i) &&
-          noMajorDiagonalConflict(newSemiBoard, newSemiBoard.length - 1, i) &&
-          noMinorDiagonalConflict(newSemiBoard, newSemiBoard.length - 1, i)){
-          findASolution(newSemiBoard, num);
+        if (i !== lastIndex && i !== lastIndex - 1 && i !== lastIndex + 1) {
+          var newSemiBoard = semiBoard.slice();
+          newSemiBoard.push(possibleRows[i]);
+          // i = col on which new queen/rook was added
+          // newSemiBoard.length - 1 = row on which new queen/rook was added
+          // if already conflicts, scrap it, don't run recursion on it.
+          if (noColConflict(newSemiBoard, newSemiBoard.length - 1, i) &&
+            noMajorDiagonalConflict(newSemiBoard, newSemiBoard.length - 1, i) &&
+            noMinorDiagonalConflict(newSemiBoard, newSemiBoard.length - 1, i)){
+            findASolution(newSemiBoard, num, i);
+          }
         }
       }
     }
