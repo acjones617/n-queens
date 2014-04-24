@@ -292,7 +292,7 @@ window.countNQueensSolutions = function(n) {
       // then, double count solutions (count mirrored solutions)
       rowsToCheck = possibleRows.length;
       if (semiBoard.length === 0) {
-        rowsToCheck = Math.floor(num/2);
+        rowsToCheck = Math.floor((num+1)/2);
       }
       for (var i = 0; i < rowsToCheck; i++) {
         var newSemiBoard = semiBoard.slice();
