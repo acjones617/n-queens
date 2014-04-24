@@ -50,7 +50,7 @@ var noMinorDiagonalConflict = function(board, rowIndex, colIndex) {
   // board[0].length should refer to num columns on board.
   for (var i = Math.max(0, diagColIndex - board[0].length + 1); i < maxIndex; i++) {
     // Don't push current row/col we're checking conflict on
-    if (i !== rowIndex && board[i][diagColIndex - 1] === 1){
+    if (i !== rowIndex && board[i][diagColIndex - i] === 1){
       return false;
     }
   }
@@ -185,53 +185,43 @@ window.findNQueensSolution = function(n) {
   var num = n || 0;
   var solution;
   // never put rooks on same row, treat this as similar to the rock/paper/scissors except each rounds are rows.
+  // recursively put rook on next row, check if colConflict.
+  // If not, then continue recursion, otherwise, cut off recursion
 
-  // generate list of possible boards;
-  var possibleBoards = [];
+  //possible rows are arrays of length num, with a single 1 in them.
+  var possibleRows = makePossibleRows(num);
 
-  //possible rows are arrays of length num, with 1 in them.
-  var zeroRow = [];
-  for (var i = 0; i < num; i++) {
-    zeroRow.push(0);
-  }
+  // now generate one solutions:
 
-  var possibleRows = [];
-  for (var j = 0; j < num; j++) {
-    var newRow = zeroRow.slice();
-    newRow[j] = 1;
-    possibleRows.push(newRow);
-  }
-
-  // now generate list of all possible boards:
-
-  var allBoards = function(semiBoard, num) {
+  var findASolution = function(semiBoard, num) {
+    if (solution) {
+      return;
+    }
     if (semiBoard.length === num) {
-      possibleBoards.push(semiBoard);
+      solution = semiBoard;
+      return;
     } else {
-      for (var k = 0; k < possibleRows.length; k++) {
+      for (var i = 0; i < possibleRows.length; i++) {
         var newSemiBoard = semiBoard.slice();
-        newSemiBoard.push(possibleRows[k]);
-        allBoards(newSemiBoard, num);
+        newSemiBoard.push(possibleRows[i]);
+        // i = col on which new queen/rook was added
+        // newSemiBoard.length - 1 = row on which new queen/rook was added
+        // if already conflicts, scrap it, don't run recursion on it.
+        if (noColConflict(newSemiBoard, newSemiBoard.length - 1, i) &&
+          noMajorDiagonalConflict(newSemiBoard, newSemiBoard.length - 1, i) &&
+          noMinorDiagonalConflict(newSemiBoard, newSemiBoard.length - 1, i)){
+          findASolution(newSemiBoard, num);
+        }
       }
     }
-  }
+  };
 
-  allBoards([], num);
+  findASolution([], num);
 
-  // now check each board. If one passes all tests, it is a solution.
-  for (var board = 0; board < possibleBoards.length; board++) {
-    var newBoard = new Board(possibleBoards[board]);
-    if (!(newBoard.hasAnyRowConflicts() || newBoard.hasAnyColConflicts() || newBoard.hasAnyMajorDiagonalConflicts() || newBoard.hasAnyMinorDiagonalConflicts())) {
-      solution = newBoard.returnBoard();
-      break;
-    }
-  }
-  if (solution) {
-    console.log('Single solution for ' + num + ' queens:', JSON.stringify(solution));
-    return solution;
-  } else {
-    return null;
-  }
+  var singleSolution = solution || null;
+
+  console.log('Single solution for ' + num + ' queens:', JSON.stringify(singleSolution));
+  return singleSolution;
 };
 
 
