@@ -1,103 +1,4 @@
-/*--------------------  Helper Functions  ---------------------*/
-
-// COLUMNS - run from top to bottom
-// --------------------------------------------------------------
-//
-// test if a specific column on this board contains a conflict
-var noColConflict = function(board, rowIndex, colIndex) {
-  // board[0].length should refer to num columns on board.
-  // minus 1 on the "i bound" since we'll always be checking against placing one on the last row,
-  // and we don't want to check that one. We are checking conflicts against that.
-  for (var i = 0; i < board.length - 1; i++) {
-    // don't check row our current piece is on
-    if (i !== rowIndex && board[i][colIndex] === 1) {
-      return false;
-    }
-  }
-  return true;
-};
-
-
-// Major Diagonals - go from top-left to bottom-right
-// --------------------------------------------------------------
-//
-// test if a specific major diagonal on this board contains a conflict
-var noMajorDiagonalConflict = function(board, rowIndex, colIndex) {
-  var diagColIndex = colIndex - rowIndex;
-  var maxIndex = Math.min(board.length, board[0].length - diagColIndex);
-  // check noColConflict for notes
-  for (var i = -Math.min(diagColIndex,0); i < maxIndex - 1; i++) {
-    if (board[i][diagColIndex + i] === 1) {
-      return false;
-    }
-  }
-  return true;
-};
-
-//TEST:
-// [[0,0,0,1,0,0],
-// [0,1,0,0,0,0],
-// [0,0,0,0,0,1]]
-
-// Minor Diagonals - go from top-right to bottom-left
-// --------------------------------------------------------------
-//
-// test if a specific minor diagonal on this board contains a conflict
-
-var noMinorDiagonalConflict = function(board, rowIndex, colIndex) {
-  var diagColIndex = rowIndex + colIndex;
-
-  var maxIndex = Math.min(diagColIndex + 1, board.length);
-  // check noColConflict for notes
-  for (var i = Math.max(0, diagColIndex - board[0].length + 1); i < maxIndex - 1; i++) {
-    if (board[i][diagColIndex - i] === 1){
-      return false;
-    }
-  }
-  return true;
-};
-
-
-/*--------------------  End of Helper Functions  ---------------------*/
-
-
-/*           _
-   ___  ___ | |_   _____ _ __ ___
-  / __|/ _ \| \ \ / / _ \ '__/ __|
-  \__ \ (_) | |\ V /  __/ |  \__ \
-  |___/\___/|_| \_/ \___|_|  |___/
-
-*/
-
-// hint: you'll need to do a full-search of all possible arrangements of pieces!
-// (There are also optimizations that will allow you to skip a lot of the dead search space)
-// take a look at solversSpec.js to see what the tests are expecting
-
-
-// return a matrix (an array of arrays) representing a single nxn chessboard, with n rooks placed such that none of them can attack each other
-
-var makeEmptyRow = function(n) {
-  return _(_.range(n)).map(function() {
-    return 0;
-  });
-};
-
-var makeEmptyMatrix = function(n) {
-  return _(_.range(n)).map(function() {
-    return _(_.range(n)).map(function() {
-      return 0;
-    });
-  });
-};
-
-var makePossibleRows = function(n) {
-  var rows = makeEmptyMatrix(n);
-  for (var i = 0; i < n; i++) {
-    rows[i][i] = 1;
-  }
-  return rows;
-};
-
+////////////////// ROOKS AND SINGLE QUEENS SOLUTION /////////////////////////
 
 window.findNRooksSolution = function(n) {
   var num = n || 0;
@@ -225,10 +126,94 @@ window.findNQueensSolution = function(n) {
 };
 
 
+
+///////////////////// N QUEENS ///////////////////////////
+
+/*--------------------  Helper Functions  ---------------------*/
+
+// COLUMNS - run from top to bottom
+// --------------------------------------------------------------
+//
+// test if a specific column on this board contains a conflict
+var noColConflict = function(board, rowIndex, colIndex) {
+  // board[0].length should refer to num columns on board.
+  // minus 1 on the "i bound" since we'll always be checking against placing one on the last row,
+  // and we don't want to check that one. We are checking conflicts against that.
+  for (var i = 0; i < board.length - 1; i++) {
+    // don't check row our current piece is on
+    if (board[i][colIndex] === true) {
+      return false;
+    }
+  }
+  return true;
+};
+
+
+// Major Diagonals - go from top-left to bottom-right
+// --------------------------------------------------------------
+//
+// test if a specific major diagonal on this board contains a conflict
+var noMajorDiagonalConflict = function(board, rowIndex, colIndex) {
+  var diagColIndex = colIndex - rowIndex;
+  var maxIndex = Math.min(board.length, board[0].length - diagColIndex);
+  // check noColConflict for notes
+  for (var i = -Math.min(diagColIndex,0); i < maxIndex - 1; i++) {
+    if (board[i][diagColIndex + i] === true) {
+      return false;
+    }
+  }
+  return true;
+};
+
+// Minor Diagonals - go from top-right to bottom-left
+// --------------------------------------------------------------
+//
+// test if a specific minor diagonal on this board contains a conflict
+
+var noMinorDiagonalConflict = function(board, rowIndex, colIndex) {
+  var diagColIndex = rowIndex + colIndex;
+
+  var maxIndex = Math.min(diagColIndex + 1, board.length);
+  // check noColConflict for notes
+  for (var i = Math.max(0, diagColIndex - board[0].length + 1); i < maxIndex - 1; i++) {
+    if (board[i][diagColIndex - i] === true){
+      return false;
+    }
+  }
+  return true;
+};
+
+
+/*--------------------  End of Helper Functions  ---------------------*/
+
+// take a look at solversSpec.js to see what the tests are expecting
+
+var makeEmptyRow = function(n) {
+  return _(_.range(n)).map(function() {
+    return false;
+  });
+};
+
+var makeEmptyMatrix = function(n) {
+  return _(_.range(n)).map(function() {
+    return _(_.range(n)).map(function() {
+      return false;
+    });
+  });
+};
+
+var makePossibleRows = function(n) {
+  var rows = makeEmptyMatrix(n);
+  for (var i = 0; i < n; i++) {
+    rows[i][i] = true;
+  }
+  return rows;
+};
+
 // return the number of nxn chessboards that exist, with n queens placed such that none of them can attack each other
 window.countNQueensSolutions = function(n) {
   var num = n || 0;
-  var solutionCount = 0; //fixme
+  var solutionCount = 0;
   // never put rooks on same row, treat this as similar to the rock/paper/scissors except each rounds are rows.
   // recursively put rook on next row, check if colConflict.
   // If not, then continue recursion, otherwise, cut off recursion

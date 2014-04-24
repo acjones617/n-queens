@@ -1,27 +1,3 @@
-
-var rows = function() {
-    return _(_.range(this.get('n'))).map(function(rowIndex) {
-      return this.get(rowIndex);
-    }, this);
-  };
-
-var hasAnyRooksConflicts = function() {
-    return this.hasAnyRowConflicts() || this.hasAnyColConflicts();
-  };
-
-var hasAnyQueenConflictsOn = function(rowIndex, colIndex) {
-    return (
-      this.hasRowConflictAt(rowIndex) ||
-      this.hasColConflictAt(colIndex) ||
-      this.hasMajorDiagonalConflictAt(this._getFirstRowColumnIndexForMajorDiagonalOn(rowIndex, colIndex)) ||
-      this.hasMinorDiagonalConflictAt(this._getFirstRowColumnIndexForMinorDiagonalOn(rowIndex, colIndex))
-    );
-  };
-
-var hasAnyQueensConflicts = function() {
-    return this.hasAnyRooksConflicts() || this.hasAnyMajorDiagonalConflicts() || this.hasAnyMinorDiagonalConflicts();
-};
-
 /*
      _             _     _
  ___| |_ __ _ _ __| |_  | |__   ___ _ __ ___ _
@@ -48,7 +24,7 @@ var moreThanOnePiece = function(array, index) {
     if (i !== index && array[i] === 1) {
       return true;
     }
-  };
+  }
   return false;
 };
 
