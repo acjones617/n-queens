@@ -101,7 +101,7 @@ var makePossibleRows = function(n) {
 
 window.findNRooksSolution = function(n) {
   var num = n || 0;
-  var allSolutions = [];
+  var solution;
   // never put rooks on same row, treat this as similar to the rock/paper/scissors except each rounds are rows.
   // recursively put rook on next row, check if colConflict.
   // If not, then continue recursion, otherwise, cut off recursion
@@ -109,11 +109,15 @@ window.findNRooksSolution = function(n) {
   //possible rows are arrays of length num, with a single 1 in them.
   var possibleRows = makePossibleRows(num);
 
-  // now generate list of all solutions:
+  // now generate one solutions:
 
-  var findAllSolutions = function(semiBoard, num) {
+  var findASolution = function(semiBoard, num) {
+    if (solution) {
+      return;
+    }
     if (semiBoard.length === num) {
-      allSolutions.push(semiBoard);
+      solution = semiBoard;
+      return;
     } else {
       for (var i = 0; i < possibleRows.length; i++) {
         var newSemiBoard = semiBoard.slice();
@@ -122,18 +126,15 @@ window.findNRooksSolution = function(n) {
         // newSemiBoard.length - 1 = row on which new queen/rook was added
         // if already conflicts, scrap it, don't run recursion on it.
         if (noColConflict(newSemiBoard, newSemiBoard.length - 1, i)){
-          findAllSolutions(newSemiBoard, num);
+          findASolution(newSemiBoard, num);
         }
       }
     }
   };
 
-  findAllSolutions([], num);
+  findASolution([], num);
 
-  var singleSolution = null;
-  if (allSolutions.length) {
-    singleSolution = allSolutions[0];
-  }
+  var singleSolution = solution || null;
 
   console.log('Single solution for ' + num + ' rooks:', JSON.stringify(singleSolution));
   return singleSolution;
@@ -153,7 +154,7 @@ window.countNRooksSolutions = function(n) {
   //possible rows are arrays of length num, with a single 1 in them.
   var possibleRows = makePossibleRows(num);
 
-  // now generate list of all solutions:
+  // now generate all solutions:
 
   var findAllSolutions = function(semiBoard, num) {
     if (semiBoard.length === num) {
