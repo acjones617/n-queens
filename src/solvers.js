@@ -277,6 +277,7 @@ window.countNQueensSolutions = function(n) {
   // now generate one solutions:
 
   var findASolution = function(semiBoard, num, lastIndex) {
+    lastIndex = lastIndex || -num;
     var rowsToCheck;
     if (semiBoard.length === num) {
       // count found solution and the mirrored solution,
@@ -295,7 +296,7 @@ window.countNQueensSolutions = function(n) {
         rowsToCheck = Math.ceil(num/2);
       }
       for (var i = 0; i < rowsToCheck; i++) {
-        if (i !== lastIndex && i !== lastIndex - 1 && i !== lastIndex + 1) {
+        if (i < lastIndex - 1 || i > lastIndex + 1) {
           var newSemiBoard = semiBoard.slice();
           newSemiBoard.push(possibleRows[i]);
           // i = col on which new queen/rook was added
