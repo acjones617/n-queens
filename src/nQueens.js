@@ -45,10 +45,12 @@ window.countNQueensSolutions = function(n) {
       // for first row, we only want to add half of possible Rows
       // then, double count solutions (count mirrored solutions)
       numsToCheck = possibleColsLeft.length;
+      var x = 0;
       if (currentLengthBoard === 0) {
         numsToCheck /= 2;
+        x = 1;
       }
-      for (var i = 0; i < numsToCheck; i++) {
+      for (var i = x; i < numsToCheck; i++) {
         // check upfront to make sure diagonal is free
         if (noDiagonalConflict(semiBoard, possibleColsLeft[i])) {
         // create copy of semiBoard so we don't mess with it.
