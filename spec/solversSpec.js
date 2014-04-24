@@ -74,10 +74,10 @@ describe('solvers', function() {
       expect(solutionCount).to.be.equal(14200);
     });
 
-    // it('n = 13', function() {
-    //   var solutionCount = countNQueensSolutions(13);
-    //   expect(solutionCount).to.be.equal(73712);
-    // });
+    it('n = 13', function() {
+      var solutionCount = countNQueensSolutions(13);
+      expect(solutionCount).to.be.equal(73712);
+    });
 
   });
 
