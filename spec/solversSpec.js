@@ -53,4 +53,22 @@ describe('solvers', function() {
 
   });
 
+  describe('countNQueensSolutions() for large N', function() {
+
+    it('n = 12', function() {
+      var solutionCount = countNQueensSolutions(12);
+      expect(solutionCount).to.be.equal(14200);
+    });
+
+    it('n = 13', function() {
+      var solutionCount = countNQueensSolutions(13);
+      expect(solutionCount).to.be.equal(73712);
+    });
+
+    it('n = 14', function() {
+      var solutionCount = countNQueensSolutions(14);
+      expect(solutionCount).to.be.equal(365596);
+    });
+  });
+
 });

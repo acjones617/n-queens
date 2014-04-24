@@ -184,7 +184,7 @@ window.countNRooksSolutions = function(n) {
 window.findNQueensSolution = function(n) {
   var num = n || 0;
   var solution;
-  // never put rooks on same row, treat this as similar to the rock/paper/scissors except each rounds are rows.
+  // never put queens on same row, treat this as similar to the rock/paper/scissors except each rounds are rows.
   // recursively put rook on next row, check if colConflict.
   // If not, then continue recursion, otherwise, cut off recursion
 
@@ -218,10 +218,10 @@ window.findNQueensSolution = function(n) {
 
   findASolution([], num);
 
-  var singleSolution = solution || null;
+  solution = solution || {n: num};
 
-  console.log('Single solution for ' + num + ' queens:', JSON.stringify(singleSolution));
-  return singleSolution;
+  console.log('Single solution for ' + num + ' queens:', JSON.stringify(solution));
+  return solution;
 };
 
 
