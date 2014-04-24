@@ -1,3 +1,79 @@
+
+var makeEmptyRow = function(n) {
+  return _(_.range(n)).map(function() {
+    return false;
+  });
+};
+
+var makeEmptyMatrix = function(n) {
+  return _(_.range(n)).map(function() {
+    return _(_.range(n)).map(function() {
+      return false;
+    });
+  });
+};
+
+var makePossibleRows = function(n) {
+  var rows = makeEmptyMatrix(n);
+  for (var i = 0; i < n; i++) {
+    rows[i][i] = true;
+  }
+  return rows;
+};
+
+////////////////// QUEEN HELPER TO SEE WHAT'S GOING ON ////////////////////////
+
+window.showQueensSolution = function(n) {
+  var num = n || 0;
+  var solution = [];
+  // never put queens on same row, treat this as similar to the rock/paper/scissors except each rounds are rows.
+  // recursively put rook on next row, check if colConflict.
+  // If not, then continue recursion, otherwise, cut off recursion
+
+  //possible rows are arrays of length num, with a single 1 in them.
+  var possibleRows = makePossibleRows(num);
+
+  // now generate solutions:
+
+  var findASolution = function(semiBoard, num) {
+    if (semiBoard.length === num) {
+      solution.push(semiBoard);
+    } else {
+      for (var i = 0; i < possibleRows.length; i++) {
+        var newSemiBoard = semiBoard.slice();
+        newSemiBoard.push(possibleRows[i]);
+        // i = col on which new queen/rook was added
+        // newSemiBoard.length - 1 = row on which new queen/rook was added
+        // if already conflicts, scrap it, don't run recursion on it.
+        if (noColConflict(newSemiBoard, newSemiBoard.length - 1, i) &&
+          noMajorDiagonalConflict(newSemiBoard, newSemiBoard.length - 1, i) &&
+          noMinorDiagonalConflict(newSemiBoard, newSemiBoard.length - 1, i)){
+          findASolution(newSemiBoard, num);
+        }
+      }
+    }
+  };
+  findASolution([], num);
+
+  var numeric = [];
+
+  for (var j = 0; j < solution.length; j++) {
+    var helper = [];
+    for (var k = 0; k < num; k++) {
+      for (var z = 0; z < num; z++) {
+        if (solution[j][k][z] === true) {
+          helper.push(z);
+        }
+      }
+    }
+    numeric.push(helper);
+  }
+
+  return JSON.stringify(numeric);
+
+};
+
+
 ////////////////// ROOKS AND SINGLE QUEENS SOLUTION /////////////////////////
 
 window.findNRooksSolution = function(n) {
@@ -100,7 +176,6 @@ window.findNQueensSolution = function(n) {
     }
     if (semiBoard.length === num) {
       solution = semiBoard;
-      return;
     } else {
       for (var i = 0; i < possibleRows.length; i++) {
         var newSemiBoard = semiBoard.slice();
@@ -188,28 +263,6 @@ var noMinorDiagonalConflict = function(board, rowIndex, colIndex) {
 
 // take a look at solversSpec.js to see what the tests are expecting
 
-var makeEmptyRow = function(n) {
-  return _(_.range(n)).map(function() {
-    return false;
-  });
-};
-
-var makeEmptyMatrix = function(n) {
-  return _(_.range(n)).map(function() {
-    return _(_.range(n)).map(function() {
-      return false;
-    });
-  });
-};
-
-var makePossibleRows = function(n) {
-  var rows = makeEmptyMatrix(n);
-  for (var i = 0; i < n; i++) {
-    rows[i][i] = true;
-  }
-  return rows;
-};
-
 // return the number of nxn chessboards that exist, with n queens placed such that none of them can attack each other
 window.countNQueensSolutions = function(n) {
   var num = n || 0;
@@ -224,11 +277,24 @@ window.countNQueensSolutions = function(n) {
   // now generate one solutions:
 
   var findASolution = function(semiBoard, num) {
+    var rowsToCheck;
     if (semiBoard.length === num) {
-      solutionCount++;
+      // count found solution and the mirrored solution,
+      // if top element not in center, else just count 1.
+      if (num % 2 === 1 && semiBoard[0][(num-1)/2]) {
+        solutionCount++;
+      } else {
+        solutionCount += 2;
+      }
       return;
     } else {
-      for (var i = 0; i < possibleRows.length; i++) {
+      // for first row, we only want to add half of possible Rows
+      // then, double count solutions (count mirrored solutions)
+      rowsToCheck = possibleRows.length;
+      if (semiBoard.length === 0) {
+        rowsToCheck = Math.floor(num/2);
+      }
+      for (var i = 0; i < rowsToCheck; i++) {
         var newSemiBoard = semiBoard.slice();
         newSemiBoard.push(possibleRows[i]);
         // i = col on which new queen/rook was added
