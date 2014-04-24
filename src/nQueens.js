@@ -27,7 +27,7 @@ window.countNQueensSolutions = function(n) {
 
   // recursively put "queen" on next "row" (aka array cell), in specific "columns" (aka the number in the array cell)
   // If it doesn't diagonally conflict, then continue recursion, otherwise, cut off recursion
-  var findSolutions = function(semiBoard, possibleColsLeft) {
+  var findSolutions = function(semiBoard, possibleColsLeft, lastIndex) {
     var numsToCheck;
     var currentLengthBoard = semiBoard.length;
 
@@ -49,20 +49,23 @@ window.countNQueensSolutions = function(n) {
         numsToCheck /= 2;
       }
       for (var i = 0; i < numsToCheck; i++) {
-        // check upfront to make sure diagonal is free
-        if (noDiagonalConflict(semiBoard, possibleColsLeft[i])) {
-        // create copy of semiBoard so we don't mess with it.
-          var newBoard = semiBoard.slice();
-          var colsLeft = possibleColsLeft.slice();
-          var nextColNum = colsLeft.splice(i,1)[0];
-          newBoard.push(nextColNum);
-          findSolutions(newBoard, colsLeft);
+        // simple check to make sure it's not immediate diagonal
+        if (possibleColsLeft[i] !== lastIndex - 1 && possibleColsLeft[i] !== lastIndex + 1) {
+          // check upfront to make sure diagonal is free
+          if (noDiagonalConflict(semiBoard, possibleColsLeft[i])) {
+          // create copy of semiBoard so we don't mess with it.
+            var newBoard = semiBoard.slice();
+            var colsLeft = possibleColsLeft.slice();
+            var nextColNum = colsLeft.splice(i,1)[0];
+            newBoard.push(nextColNum);
+            findSolutions(newBoard, colsLeft, nextColNum);
+          }
         }
       }
     }
   };
 
-  findSolutions([], possibleRows);
+  findSolutions([], possibleRows, -10);
 
   console.log('Number of solutions for ' + n + ' queens:', solutionCount);
   return solutionCount;
