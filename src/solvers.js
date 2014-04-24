@@ -276,8 +276,7 @@ window.countNQueensSolutions = function(n) {
 
   // now generate one solutions:
 
-  var findASolution = function(semiBoard, num, lastIndex) {
-    lastIndex = lastIndex || -num;
+  var findASolution = function(semiBoard, num, lastIndex, lastLastIndex) {
     var rowsToCheck;
     if (semiBoard.length === num) {
       // count found solution and the mirrored solution,
@@ -296,7 +295,7 @@ window.countNQueensSolutions = function(n) {
         rowsToCheck = Math.ceil(num/2);
       }
       for (var i = 0; i < rowsToCheck; i++) {
-        if (i < lastIndex - 1 || i > lastIndex + 1) {
+        if (i !== lastIndex && i !== lastIndex - 1 && i !== lastIndex + 1 && i !== lastLastIndex - 2 && i !== lastLastIndex && i !== lastLastIndex + 2) {
           var newSemiBoard = semiBoard.slice();
           newSemiBoard.push(possibleRows[i]);
           // i = col on which new queen/rook was added
@@ -305,7 +304,7 @@ window.countNQueensSolutions = function(n) {
           if (noColConflict(newSemiBoard, newSemiBoard.length - 1, i) &&
             noMajorDiagonalConflict(newSemiBoard, newSemiBoard.length - 1, i) &&
             noMinorDiagonalConflict(newSemiBoard, newSemiBoard.length - 1, i)){
-            findASolution(newSemiBoard, num, i);
+            findASolution(newSemiBoard, num, i, lastIndex, lastLastIndex);
           }
         }
       }
