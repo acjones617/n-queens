@@ -1,3 +1,5 @@
+//next step: change from recursive function to loop...?
+
 var noDiagonalConflict = function(board, next) {
   var numberIndex = board.length;
   var numberCheck = next;
