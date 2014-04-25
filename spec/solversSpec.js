@@ -74,19 +74,19 @@ describe('solvers', function() {
       expect(solutionCount).to.be.equal(14200);
     });
 
-    // it('n = 13', function() {
-    //   var solutionCount = countNQueensSolutions(13);
-    //   expect(solutionCount).to.be.equal(73712);
-    // });
+    it('n = 13', function() {
+      var solutionCount = countNQueensSolutions(13);
+      expect(solutionCount).to.be.equal(73712);
+    });
 
-    // it('n = 14', function() {
-    //   var solutionCount = countNQueensSolutions(14);
-    //   expect(solutionCount).to.be.equal(365596);
-//    });
-    // it('n = 15', function() {
-    //   var solutionCount = countNQueensSolutions(15);
-    //   expect(solutionCount).to.be.equal(2279184);
-    //  });
+    it('n = 14', function() {
+      var solutionCount = countNQueensSolutions(14);
+      expect(solutionCount).to.be.equal(365596);
+   });
+    it('n = 15', function() {
+      var solutionCount = countNQueensSolutions(15);
+      expect(solutionCount).to.be.equal(2279184);
+     });
 
   });
 

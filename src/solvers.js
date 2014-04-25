@@ -1,3 +1,15 @@
+window.noDiagonalConflict = function(board, next) {
+  var numberIndex = board.length;
+  var numberCheck = next;
+
+  for (var i = 0; i < board.length; i++) {
+    if (numberCheck + (i - numberIndex) === board[i] || numberCheck - (i - numberIndex) === board[i]) {
+      return false;
+    }
+  }
+  return true;
+};
+
 window.findNQueensSolution = function(n) {
   var solution = [];
   var possibleCols = [];

@@ -1,70 +1,126 @@
-// BITWISE?
+// more complicated version that takes symmetrical solutions into account.
 
-window.noDiagonalConflict = function(board, next) {
-  var numberIndex = board.length;
-  var numberCheck = next;
+function countNQueensSolutions(n) {
+  // start with a list of bit ones, length = n
+  var allOnes = (1 << n) - 1;
+  // keep track of number of solutions
+  var solutions = 0;
 
-  for (var i = 0; i < board.length; i++) {
-    if (numberCheck + (i - numberIndex) === board[i] || numberCheck - (i - numberIndex) === board[i]) {
-      return false;
-    }
+  var evenNum = false;
+  if (n % 2 === 0) {
+    evenNum = true;
   }
-  return true;
-};
+  var firstRow = true;
 
-
-window.countNQueensSolutions = function(n) {
-  if (n === 0) {
-    return 1;
-  }
-  var solutionCount = 0;
-
-  //possible cols is just a range of numbers from 0 to n now.
-  var possibleCols = [];
-  for (var i = 0; i < n; i++) {
-    possibleCols.push(i);
-  }
-
-  // recursively put "queen" on next "row" (aka array cell), in specific "columns" (aka the number in the array cell)
-  // If it doesn't diagonally conflict, then continue recursion, otherwise, cut off recursion
-  var findSolutions = function(semiBoard, possibleColsLeft) {
-    var numsToCheck;
-    var currentLengthBoard = semiBoard.length;
-
-    if (currentLengthBoard === n) {
-      // count found solution and the mirrored solution,
-      // if top element not in exact center, count 2,
-      // else just count 1.
-      if (n % 2 === 1 && semiBoard[0] === (n-1)/2) {
-        solutionCount++;
+  function recurs(rightCon, leftCon, columnCon, middleRowForOdd) {
+    // if our columnConflicts occur in every slot, we have reached a solution,
+    // increment solutions.
+    // unless we started in the middle row, for odd n's, increment 2.
+    // Otherwise, only increment 1 so we don't double count.
+    if (columnCon === allOnes) {
+      if (evenNum || !middleRowForOdd) {
+        solutions += 2;
       } else {
-        solutionCount += 2;
+        solutions++;
       }
-      return;
     } else {
-      // for first row, we only want to add half of possible Rows
-      // then, double count solutions (count mirrored solutions)
-      numsToCheck = possibleColsLeft.length;
-      if (currentLengthBoard === 0) {
-        numsToCheck /= 2;
+    // the open "slots" aka columns for the next row are defined
+    // by taking the inverse of all conflicts and &ing with allOnes
+    // Making additional caveat for if this is the first row... only look at half of columns
+    // use symmetry to look at other half.
+    if (firstRow) {
+      if (evenNum) {
+        open = ~(rightCon | leftCon | columnCon) & ((1 << n/2) - 1);
+      } else {
+        open = ~(rightCon | leftCon | columnCon) & ((1 << ((n+1)/2)) - 1);
       }
-      for (var i = 0; i < numsToCheck; i++) {
-        // check upfront to make sure diagonal is free (checks from top of board down)
-        if (noDiagonalConflict(semiBoard, possibleColsLeft[i])) {
-        // create copy of semiBoard so we don't mess with it.
-          var newBoard = semiBoard.slice();
-          var colsLeft = possibleColsLeft.slice();
-          var nextCol = colsLeft.splice(i,1)[0];
-          newBoard.push(nextCol);
-          findSolutions(newBoard, colsLeft);
+    } else {
+      var open = ~(rightCon | leftCon | columnCon) & allOnes;
+    }
+      // loop through all possible columns for this next row.
+      while (open !== 0) {
+        firstRow = false;
+        // the next possible column to check will be the "rightmost" one
+        // aka the least significant binary number on open bit num
+        var nextOpen = (open & -open);
+        // remaining open slots = open, less the nextOpen single slot to check.
+        open = open ^ nextOpen;
+        // check to see if n is odd and we are in middle on first row,
+        // switch middleRowForOdd check to true.
+        if (((columnCon | open) === 0) && !evenNum) {
+          middleRowForOdd = true;
         }
+        // save references to the current conflicts
+        var right = rightCon;
+        var left = leftCon;
+        var column = columnCon;
+
+        // update all conflicts for the next recursive row to check 
+        rightCon = ((rightCon >> 1) | (nextOpen >> 1)) & allOnes;
+        leftCon = ((leftCon << 1) | (nextOpen << 1)) & allOnes;
+        columnCon = columnCon | nextOpen;
+        // recurse through next row, passing conflicts
+        recurs(rightCon, leftCon, columnCon, middleRowForOdd);
+
+        // reset conflicts list for next open slot to check on current row.
+        rightCon = right;
+        leftCon = left;
+        columnCon = column;
       }
     }
-  };
+  }
+  // kick off recursive function with zero conflicts (for top row)
+  recurs(0, 0, 0, false);
+  
+  return solutions;
+}
 
-  findSolutions([], possibleCols);
 
-  console.log('Number of solutions for ' + n + ' queens:', solutionCount);
-  return solutionCount;
-};
+// Less complicated version, doesn't use symmetrical property to only go through first half
 
+// function countNQueensSolutions(n) {
+//   // start with a list of bit ones, length = n
+//   var allOnes = (1 << n) - 1;
+//   // keep track of number of solutions
+//   var solutions = 0;
+
+//   function recurs(rightCon, leftCon, columnCon) {
+//     // if our columnConflicts occur in every slot, we have reached a solution,
+//     // increment solutions.
+//     if (columnCon === allOnes) {
+//       solutions++;
+//     } else {
+//     // the open "slots" aka columns for the next row are defined
+//     // by taking the inverse of all conflicts and &ing with allOnes
+//     var open = ~(rightCon | leftCon | columnCon) & allOnes;
+//       // loop through all possible columns for this next row.
+//       while (open !== 0) {
+//         // the next possible column to check will be the "rightmost" one
+//         // aka the least significant binary number on open bit num
+//         var nextOpen = (open & -open);
+//         // remaining open slots are open, less the nextOpen single slot to check.
+//         open = open ^ nextOpen;
+//         // save references to the current conflicts
+//         var right = rightCon;
+//         var left = leftCon;
+//         var column = columnCon;
+
+//         // update all conflicts for the next recursive row to check 
+//         rightCon = ((rightCon >> 1) | (nextOpen >> 1)) & allOnes;
+//         leftCon = ((leftCon << 1) | (nextOpen << 1)) & allOnes;
+//         columnCon = columnCon | nextOpen;
+//         // recurse through next row, passing conflicts
+//         recurs(rightCon, leftCon, columnCon);
+
+//         // reset conflicts list for next open slot to check on current row.
+//         rightCon = right;
+//         leftCon = left;
+//         columnCon = column;
+//       }
+//     }
+//   }
+//   // kick off recursive function with zero conflicts (for top row)
+//   recurs(0, 0, 0);
+  
+//   return solutions;
+// }
